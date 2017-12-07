@@ -2,11 +2,18 @@ package fi.solinor.mathathon.resultservice;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
+import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.boot.SpringApplication;
@@ -15,7 +22,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import mathathon2017.util.ImageBase;
@@ -28,7 +34,6 @@ public class ResultserviceApplication {
 	}
 	
 	@RestController
-	@RequestMapping("/")
 	class ResultController {
 	    
 	    private Map<String, ImageBase> images = new HashMap<>();
@@ -37,14 +42,13 @@ public class ResultserviceApplication {
 	    
         private BufferedImage solinorLogo = ImageUtils.getImage("solinor_avatar.png");
 
-	    @GetMapping(value="results/")
+	    @GetMapping(value="/results/")
 	    Map<String, Long> getResults() {
 	        return results;
 	    }
 	    
-	    @PutMapping(value="submit/{name}", consumes="application/json")
+	    @PutMapping(value="/submit/{name}", consumes="application/json")
 	    String uploadResults(@PathVariable String name, @RequestBody ImageBase imageBase) {
-	        System.err.println(imageBase);
 	        if(imageBase.getTriangles().size() != 30) {
 	            System.out.println("Triangle count was " + imageBase.getTriangles().size());
 	            return "Triangle count not 30";
@@ -57,12 +61,18 @@ public class ResultserviceApplication {
 	        return "ok";
 	    }
 	    
-	    @GetMapping(value="test")
-	    String test() {
-	        return solinorLogo.toString();
+	    @GetMapping(value="/", produces="text/html")
+	    void test(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	    	List<String> names = new ArrayList<>();
+	    	results.entrySet().stream().sorted(Comparator.comparing(Entry::getValue)).forEach(e->names.add(e.getKey()));
+	    	request.setAttribute("names", names);
+	    	request.setAttribute("results", results);
+	        request.getRequestDispatcher("/index.jsp").forward(request, response);
+	        response.setHeader("Content-type", "text/html");
+	        
 	    }
-	    @GetMapping(value="picture/{name}")
-	    public void showImage(@PathVariable String name, HttpServletResponse response) throws Exception {
+	    @GetMapping(value="/picture/{name}")
+	    void showImage(@PathVariable String name, HttpServletResponse response) throws Exception {
 
 	      ByteArrayOutputStream jpegOutputStream = new ByteArrayOutputStream();
 	      if(!images.containsKey(name)) {
