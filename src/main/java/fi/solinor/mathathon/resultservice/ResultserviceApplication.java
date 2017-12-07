@@ -1,8 +1,13 @@
 package fi.solinor.mathathon.resultservice;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -55,6 +60,31 @@ public class ResultserviceApplication {
 	    @GetMapping(value="test")
 	    String test() {
 	        return solinorLogo.toString();
+	    }
+	    @GetMapping(value="picture/{name}")
+	    public void showImage(@PathVariable String name, HttpServletResponse response) throws Exception {
+
+	      ByteArrayOutputStream jpegOutputStream = new ByteArrayOutputStream();
+	      if(!images.containsKey(name)) {
+	    	  return;
+	      }
+	      try {
+	        BufferedImage image = ImageUtils.drawImage(images.get(name), solinorLogo.getWidth(), solinorLogo.getHeight());
+	        ImageIO.write(image, "png", jpegOutputStream);
+	      } catch (IllegalArgumentException e) {
+	        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+	      }
+
+	      byte[] imgByte = jpegOutputStream.toByteArray();
+
+	      response.setHeader("Cache-Control", "no-store");
+	      response.setHeader("Pragma", "no-cache");
+	      response.setDateHeader("Expires", 0);
+	      response.setContentType("image/jpeg");
+	      ServletOutputStream responseOutputStream = response.getOutputStream();
+	      responseOutputStream.write(imgByte);
+	      responseOutputStream.flush();
+	      responseOutputStream.close();
 	    }
 	}
 }
