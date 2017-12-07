@@ -66,13 +66,15 @@ public class ResultserviceApplication {
 
 	      ByteArrayOutputStream jpegOutputStream = new ByteArrayOutputStream();
 	      if(!images.containsKey(name)) {
-	    	  return;
+		        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		        return;
 	      }
 	      try {
 	        BufferedImage image = ImageUtils.drawImage(images.get(name), solinorLogo.getWidth(), solinorLogo.getHeight());
 	        ImageIO.write(image, "png", jpegOutputStream);
 	      } catch (IllegalArgumentException e) {
 	        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+	        return;
 	      }
 
 	      byte[] imgByte = jpegOutputStream.toByteArray();
@@ -80,7 +82,7 @@ public class ResultserviceApplication {
 	      response.setHeader("Cache-Control", "no-store");
 	      response.setHeader("Pragma", "no-cache");
 	      response.setDateHeader("Expires", 0);
-	      response.setContentType("image/jpeg");
+	      response.setContentType("image/png");
 	      ServletOutputStream responseOutputStream = response.getOutputStream();
 	      responseOutputStream.write(imgByte);
 	      responseOutputStream.flush();
