@@ -7,6 +7,7 @@
 </head>
 <body>
     <a href="https://github.com/mozzie/mathathon17">GitHub</a>
+    <img src="talvi.png"/>
 	<table>
 	   <tr><td>kuva</td><td>tiimi</td><td>pisteet</td></tr>
 		<c:forEach var="name" items="${names}">

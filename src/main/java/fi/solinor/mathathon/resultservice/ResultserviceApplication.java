@@ -40,8 +40,9 @@ public class ResultserviceApplication {
 	    
 	    private Map<String, Long> results = new HashMap<>();
 	    
-        private BufferedImage solinorLogo = ImageUtils.getImage("solinor_avatar.png");
+        private BufferedImage solinorLogo = ImageUtils.getImage("talvi.png");
 
+        
 	    @GetMapping(value="/results/")
 	    Map<String, Long> getResults() {
 	        return results;
@@ -82,6 +83,28 @@ public class ResultserviceApplication {
 	      try {
 	        BufferedImage image = ImageUtils.drawImage(images.get(name), solinorLogo.getWidth(), solinorLogo.getHeight());
 	        ImageIO.write(image, "png", jpegOutputStream);
+	      } catch (IllegalArgumentException e) {
+	        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+	        return;
+	      }
+
+	      byte[] imgByte = jpegOutputStream.toByteArray();
+
+	      response.setHeader("Cache-Control", "no-store");
+	      response.setHeader("Pragma", "no-cache");
+	      response.setDateHeader("Expires", 0);
+	      response.setContentType("image/png");
+	      ServletOutputStream responseOutputStream = response.getOutputStream();
+	      responseOutputStream.write(imgByte);
+	      responseOutputStream.flush();
+	      responseOutputStream.close();
+	    }
+	    @GetMapping(value="/talvi.png")
+	    void showTarget(HttpServletResponse response) throws Exception {
+
+	      ByteArrayOutputStream jpegOutputStream = new ByteArrayOutputStream();
+	      try {
+	        ImageIO.write(solinorLogo, "png", jpegOutputStream);
 	      } catch (IllegalArgumentException e) {
 	        response.sendError(HttpServletResponse.SC_NOT_FOUND);
 	        return;
