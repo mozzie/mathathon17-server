@@ -3,9 +3,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Hello</title>
+<title>Mathathon 2017 resultservice</title>
 </head>
 <body>
+    <a href="https://github.com/mozzie/mathathon17">GitHub</a>
 	<table>
 	   <tr><td>kuva</td><td>tiimi</td><td>pisteet</td></tr>
 		<c:forEach var="name" items="${names}">
