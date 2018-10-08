@@ -8,3 +8,5 @@ Backend server created for Mathathon, a hackathon for math students. Challenge w
 
 ## Other
 Currently only supports one target image and the image can't be changed to another one without restarting the system. This should be finished if project is ever re-used.
+
+Buzzwords: Java, Spring Boot, Maven
